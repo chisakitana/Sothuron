@@ -74,3 +74,5 @@
 
 - [build_document.py](build_document.py)：初期の準備版の生成用。Wordの直接編集を消さないよう、通常の更新では再実行しません。
 - [.gitignore](.gitignore)：Wordの一時ファイルや確認用画像等の除外設定。
+
+閲覧用のPDFとWordは、会話内で直接開けるファイルとして提示します。GitHubは保存先として引き続き利用します。
