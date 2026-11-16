@@ -213,3 +213,45 @@
 - GitHubへの反映状況：前回d3c79deは反映済み。今回は閲覧画像3点と方針・ログを一つのローカルコミットに保存して通常pushし、ローカルとリモートのSHA一致を確認する。今回の最終結果はGit履歴と最終報告を参照。
 
 - 提示前の確認：生成画像3枚をすべて表示して目視確認し、日本語、配置、参考文献、ページ番号1～3に欠落や崩れがないことを確認した。
+
+
+## 2026-11-16（日本時間19:49に時刻確認）・第7回：Sitesを閲覧窓口にし、GitHubを保存用フォルダーとして運用
+
+### 依頼・決定事項
+- ユーザーが@sitesを指定し、今後Sitesで運用し、GitHubをパソコンのフォルダーの感覚で使いたいと希望した。
+- GitHubはWord・PDF・文献一覧・ログ・サイトの保存先とし、日常の閲覧窓口として本人用のSitesを作成した。Word正本とローカル編集・毎回コミット/pushする既存方針は維持する。
+
+### 作業内容・変更ファイル
+- 作業開始時に未保存変更がないことを確認してfetch。先頭19bae63を確認した。
+- site/index.html、style.css、app.js、build.py、README.md、.openai/hosting.jsonとdist/配布物を作成。AGENTS.md、README.md、WORK_LOG.mdに新しい運用方針・注意点・手順を追記した。
+- サイトに、準備版の全3ページ画像・拡大表示・Word由来の文字表示・PDF/Wordの保存・学術文献/公的資料の絞り込み・確認状況・次の作業を用意した。
+- 文字表示はpython-docxでWordから抽出。文献一覧はREFERENCES.mdから抽出し、学術文献6件・公的資料2件。研究結果や要約は新規作成していない。本文精読未実施という状態を維持した。
+- Word、PDF、既存のページ画像の原本は変更していない。生成スクリプトbuild_document.pyは実行していない。
+
+### 参照資料
+- 今回のユーザーの依頼、既存のWord/PDF/REFERENCES.md/WORK_LOG.md。
+- Sitesスキル：skill://plugin_connector_1p_689987207de08191979cf68eca2941c6/sites/SKILL.md および同パッケージのreferences/troubleshooting.md。
+- クラウド環境ランタイムスキル：skill://plugin_connector_1p_c5b7d5df5d7081918f2c4be5a633ed5d/cloud-environment-runtime/SKILL.md。
+- GitHub：https://github.com/chisakitana/Sothuron
+
+### 確認結果・判断理由
+- HTMLから参照するローカルファイルの存在、Word/PDF原本と配布コピーのバイト一致、画像3枚、文献8件（学術6・公的2）、JavaScript構文を確認した。
+- SITES_MANAGED_LINUX_CONTAINER=1だがブラウザ操作ツールが提供されていないため、Sitesの指示に従いプレビューサーバーの起動・代替ブラウザの導入は行っていない。モバイル向けCSS、標準のdialog、16pxの文字表示を実装したが、実ブラウザでの操作確認は未実施。
+- 環境内にSitesのsource helperスクリプトがなく、参照先の取得もできなかったため、ビルド不要の静的構成を選んだ。GitでSites用リポジトリへソースをpushし、その同じコミットのdist/とhosting.jsonだけをtarにまとめてネイティブのSites保存・本人用配布処理に渡した。ソース認証情報はプロセスの標準入力とメモリに限定し、ファイル・ログ・引数には保存していない。
+- ネイティブ配布処理がsucceededとなり、下記URLを返した。作成時の本人限定設定を維持。これはサイトの配布成功であり、iPhoneでの閲覧成功を実機確認したという意味ではない。
+
+### Sitesへの反映
+- URL：https://sothuron-study-hub.jocundwaxwing8.chatgpt.site
+- project_id：appgprj_6afadeacbf548191a85f61ea93af7048
+- サイトソースのコミット：b35f70e8e92e41b517703797d371525b75d495f8
+- 保存版：appgprj_6afadeacbf548191a85f61ea93af7048~appgver_879ba12412d481919a1a16ec87bb1aca
+- 配布ID：appgdep_6afadfa544708191af368309eb8d22ad、結果succeeded。
+- 同梱の作業ログはサイト配布準備時点（第6回まで）のコピー。今回の配布結果はリポジトリ直下の本ログに記録し、次回サイト更新時に同梱ログも更新する。サイトソースの同期とGitHubの保存は別々に行う。
+
+### 未確認事項・次の作業
+- ユーザーのiPhoneでサイトの閲覧・画像拡大・文字表示・PDF/Wordの保存ができるかは、実際のアクセスで確認が必要。
+- サイト上では文章を編集せず、会話で依頼を受けて正本Wordを更新する。更新時には同版のPDF・画像・サイトもそろえる。
+- 大学資料、期限、文字数、中心とする発達領域・対象年齢、引用様式は未確定。文献本文の精読は未実施のまま。
+
+### GitHubへの反映状況
+- サイトのソース・配布物と運用ルール・本ログを一つのローカルコミットに保存してmainへ通常pushする。リモートとローカルのSHA一致を確認し、結果はGit履歴と最終報告で提示する。今回自身のSHAを事前には記載しない。
