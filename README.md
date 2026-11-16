@@ -76,3 +76,5 @@
 - [.gitignore](.gitignore)：Wordの一時ファイルや確認用画像等の除外設定。
 
 閲覧用のPDFとWordは、会話内で直接開けるファイルとして提示します。GitHubは保存先として引き続き利用します。
+
+- [previews/](previews/)：PDFの各ページの閲覧用画像。iPhone等でファイルを開けない場合に会話内で表示する補助版です。
