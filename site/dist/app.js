@@ -7,7 +7,7 @@ document.querySelectorAll('[data-page]').forEach(button => button.addEventListen
   const image = document.getElementById('viewer-image');
   image.src = `pages/thesis-page-${number}.png`;
   image.alt = `研究準備版 ${number}ページ目の拡大表示`;
-  document.getElementById('viewer-label').textContent = `${number} / 3 ページ`;
+  document.getElementById('viewer-label').textContent = `${number} / ${document.querySelectorAll('[data-page]').length} ページ`;
   if (typeof viewer.showModal === 'function') {
     viewer.showModal();
   } else {
