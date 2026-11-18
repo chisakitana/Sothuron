@@ -14,10 +14,12 @@ OUT = SITE / 'dist'
 OUT.mkdir(exist_ok=True)
 assets = OUT / 'files'
 assets.mkdir(exist_ok=True)
-for name in ['thesis.docx', 'thesis.pdf', 'REFERENCES.md', 'WORK_LOG.md']:
+for name in ['thesis.docx', 'thesis.pdf', 'REFERENCES.md', 'WORK_LOG.md', 'THESIS_REQUIREMENTS.md']:
     shutil.copyfile(ROOT / name, assets / name)
 previews = OUT / 'pages'
 previews.mkdir(exist_ok=True)
+for stale in previews.glob('thesis-page-*.png'):
+    stale.unlink()
 for image in sorted((ROOT / 'previews').glob('thesis-page-*.png')):
     shutil.copyfile(image, previews / image.name)
 refs = []
