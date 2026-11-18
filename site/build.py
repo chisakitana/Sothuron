@@ -5,12 +5,14 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from html import escape
 from docx import Document
+from docx.text.paragraph import Paragraph
+from docx.table import Table
 import fitz
 SITE=Path(__file__).resolve().parent
 ROOT=SITE.parent
 OUT=SITE/'dist';OUT.mkdir(exist_ok=True)
 assets=OUT/'files';assets.mkdir(exist_ok=True)
-for name in ['thesis.docx','thesis.pdf','REFERENCES.md','WORK_LOG.md','THESIS_REQUIREMENTS.md','LITERATURE_NOTES.md']:
+for name in ['thesis.docx','thesis.pdf','REFERENCES.md','WORK_LOG.md','THESIS_REQUIREMENTS.md','LITERATURE_NOTES.md','STYLE_GUIDE.md','RESEARCH_PLAN.md']:
     shutil.copyfile(ROOT/name,assets/name)
 pdf=fitz.open(ROOT/'thesis.pdf')
 page_count=len(pdf)
@@ -21,13 +23,13 @@ for n,page in enumerate(pdf,1):
     image=ROOT/'previews'/f'thesis-page-{n}.png';assert image.exists(),f'Missing preview: {image}'
     shutil.copyfile(image,previews/image.name)
     text=re.sub(r'\s+','',page.get_text())
-    if n==1:label='研究計画'
-    elif '第2章方法' in text:label='方法'
-    elif '第3章結果' in text:label='結果'
-    elif '言語とコミュニケーション' in text:label='結果の続き'
-    elif '公的資料と確認事項' in text:label='候補文献と確認事項'
-    elif '結果で引用した文献' in text:label='文献'
-    else:label='原稿の続き'
+    if n==1:label='はじめに・問題と目的'
+    elif '方法' in text and '調査時期' in text:label='方法'
+    elif '総合考察' in text:label='総合考察'
+    elif 'おわりに' in text:label='おわりに・文献'
+    elif '文献' in text and 'JAMAPediatrics' in text:label='文献'
+    elif '表1' in text and '研究者' in text:label='結果と文献整理表'
+    else:label='結果の続き'
     pix=fitz.Pixmap(str(image))
     links.append(f'<a href="#page-{n}">{n} {label}</a>')
     loading=' loading="lazy"' if n>1 else ''
@@ -43,7 +45,15 @@ for i,m in enumerate(entries):
     status=re.search(r'- 確認：(.+)',chunk)
     refs.append({'number':int(m[1]),'title':re.sub(r'https://\S+','',m[2]).strip(),'url':url[0] if url else '', 'status':status[1] if status else '', 'kind':kind})
 assert len(refs)==len({r['number'] for r in refs})
-paragraphs=[p.text for p in Document(ROOT/'thesis.docx').paragraphs if p.text.strip()]
+doc=Document(ROOT/'thesis.docx')
+paragraphs=[]
+for element in doc.element.body:
+    if element.tag.endswith('}p'):
+        text=Paragraph(element,doc).text
+        if text.strip():paragraphs.append(text)
+    elif element.tag.endswith('}tbl'):
+        table=Table(element,doc)
+        for row in table.rows:paragraphs.append(' ｜ '.join(cell.text.replace('\n',' ') for cell in row.cells))
 updated=datetime.now(ZoneInfo('Asia/Tokyo')).strftime('%Y.%m.%d')
 data={'updated':updated,'references':refs,'paragraphs':paragraphs,'pageCount':page_count}
 (OUT/'data.json').write_text(json.dumps(data,ensure_ascii=False,indent=2))
