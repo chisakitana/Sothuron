@@ -24,10 +24,11 @@ for n,page in enumerate(pdf,1):
     shutil.copyfile(image,previews/image.name)
     text=re.sub(r'\s+','',page.get_text())
     if n==1:label='はじめに・問題と目的'
+    elif '親との愛着関係については、Shawcroft' in text:label='問題と目的の続き'
     elif '方法' in text and '調査時期' in text:label='方法'
     elif '総合考察' in text:label='総合考察'
     elif 'おわりに' in text:label='おわりに・文献'
-    elif '文献' in text and 'JAMAPediatrics' in text:label='文献'
+    elif any(doi in text for doi in ['10.1001/jamapediatrics','10.57440/jncm','10.5332/hatsuhatsu']):label='文献'
     elif '表1' in text and '研究者' in text:label='結果と文献整理表'
     else:label='結果の続き'
     pix=fitz.Pixmap(str(image))
@@ -43,7 +44,8 @@ for i,m in enumerate(entries):
     kind='公的資料' if section=='公的資料' else '学術文献'
     url=re.search(r'https://[^\s]+',chunk)
     status=re.search(r'- 確認：(.+)',chunk)
-    refs.append({'number':int(m[1]),'title':re.sub(r'https://\S+','',m[2]).strip(),'url':url[0] if url else '', 'status':status[1] if status else '', 'kind':kind})
+    form=re.search(r'- 種別：(.+)',chunk)
+    refs.append({'number':int(m[1]),'title':re.sub(r'https://\S+','',m[2]).strip(),'url':url[0] if url else '', 'status':((form[1]+' ' if form else '')+(status[1] if status else '')), 'kind':kind})
 assert len(refs)==len({r['number'] for r in refs})
 doc=Document(ROOT/'thesis.docx')
 paragraphs=[]
