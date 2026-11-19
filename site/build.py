@@ -19,18 +19,24 @@ page_count=len(pdf)
 previews=OUT/'pages';previews.mkdir(exist_ok=True)
 for stale in previews.glob('thesis-page-*.png'):stale.unlink()
 links=[];pages=[]
+current_label='はじめに・問題と目的'
 for n,page in enumerate(pdf,1):
     image=ROOT/'previews'/f'thesis-page-{n}.png';assert image.exists(),f'Missing preview: {image}'
     shutil.copyfile(image,previews/image.name)
     text=re.sub(r'\s+','',page.get_text())
     if n==1:label='はじめに・問題と目的'
     elif '親との愛着関係については、Shawcroft' in text:label='問題と目的の続き'
-    elif '方法' in text and '調査時期' in text:label='方法'
-    elif '総合考察' in text:label='総合考察'
-    elif 'おわりに' in text:label='おわりに・文献'
-    elif any(doi in text for doi in ['10.1001/jamapediatrics','10.57440/jncm','10.5332/hatsuhatsu']):label='文献'
-    elif '表1' in text and '研究者' in text:label='結果と文献整理表'
-    else:label='結果の続き'
+    else:
+        markers=[('Ⅲ．方法','方法'),('Ⅳ．結果','結果・文献整理表'),
+                 ('1．運動発達と能力について','運動発達と能力'),
+                 ('2．睡眠について','睡眠'),('3．親との愛着関係について','親との愛着関係'),
+                 ('4．言語とコミュニケーションについて','言語とコミュニケーション'),
+                 ('5．情緒と行動に関する補足的な結果','情緒と行動'),
+                 ('Ⅴ．総合考察','総合考察'),('Ⅵ．おわりに','おわりに・文献')]
+        matches=[(text.index(key),value) for key,value in markers if key in text]
+        if matches:current_label=sorted(matches)[-1][1]
+        elif 'https://doi.org/' in text:current_label='文献'
+        label=current_label
     pix=fitz.Pixmap(str(image))
     links.append(f'<a href="#page-{n}">{n} {label}</a>')
     loading=' loading="lazy"' if n>1 else ''
